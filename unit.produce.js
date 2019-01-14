@@ -6,7 +6,7 @@ roles[0]='miner';
 roles[1]='builder';
 roles[2]='melee';
 
-var ratio={'miner':0.75,'builder':0.13,'melee':0.12};
+var ratio={'miner':0.9,'builder':0.1,'melee':0.00};
     
 
 var unitProduce={

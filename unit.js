@@ -1,6 +1,10 @@
 var unit={
     getUnitSum:function(){
-        return Game.creeps.length;
+        var sum=0;
+        for(var unit in Game.creeps){
+            sum++;
+        }
+        return sum;
     },
     
     getRoleSum:function(role){

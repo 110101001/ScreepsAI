@@ -24,10 +24,16 @@ var roleBuilder = {
             }
 	    }
 	    else {
-	        var sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
+	        var base=creep.room.find(FIND_STRUCTURES,{
+                filter: (structure) => {
+                    return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.energy > creep.carryCapacity;
+                }
+            });
+	       if(base.length){
+            if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(base[0]);
             }
+	       }
 	    }
 	}
 };

@@ -9,7 +9,6 @@
 var roleMiner={
     run:function(creep){
         if(creep.carry.energy==creep.carryCapacity){
-            creep.say('Transport');
             var base=creep.room.find(FIND_STRUCTURES,{
                 filter: (structure) => {
                     return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
@@ -24,9 +23,12 @@ var roleMiner={
         else{
             var source=creep.room.find(FIND_SOURCES);
             if(source.length){
-                if(creep.harvest(source[0])==ERR_NOT_IN_RANGE){
-                    creep.moveTo(source[0]);
-                    creep.say('Moving to source!');
+                if(creep.harvest(source[creep.memory.target])==ERR_NOT_IN_RANGE){
+                    if(creep.moveTo(source[creep.memory.target])==ERR_NO_PATH){
+                        if((creep.memory.target+1)<source.length){
+                            creep.memory.target+=1;
+                        }
+                    }
                 }
             }
         }

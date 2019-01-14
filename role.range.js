@@ -1,4 +1,4 @@
-var roleMelee={
+var roleRange={
     run:function(creep){
             var enemy=creep.room.find(FIND_HOSTILE_CREEPS);
             if(enemy.length){
@@ -13,4 +13,4 @@ var roleMelee={
     }
         
 };
-module.exports = roleMelee;
+module.exports = roleRange;

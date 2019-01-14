@@ -8,7 +8,7 @@ var roleMelee={
             }
             else{
                 var _exit=creep.room.find(FIND_EXIT);
-                creep.moveTo(_exit[0]);
+                creep.moveTo(25,25);
             }
     }
         

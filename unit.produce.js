@@ -40,7 +40,7 @@ var unitProduce={
     },
     
     produce:function (spawn){
-        var sum=unit.getUnitSum();
+        var sum=unit.getUnitSum(spawn.room);
         if(unit.getRoleSum('miner')<6*spawn.room.find(FIND_SOURCES).length){//before fully developed
             for(var index in roles){
                 if(unit.getRoleSum(roles[index])/sum<ratio[roles[index]]){

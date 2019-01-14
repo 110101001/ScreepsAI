@@ -8,7 +8,7 @@ var towerAct={
         }
         var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if(closestHostile) {
-            console.log(tower.attack(closestHostile));
+            tower.attack(closestHostile);
         }
     }
        

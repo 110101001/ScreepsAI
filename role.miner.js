@@ -2,7 +2,7 @@ var roleMiner={
     run:function(creep){
         var source=creep.room.find(FIND_SOURCES);
         if(creep.carry.energy>0){
-            if(!creep.harvest(source[creep.memory.target])){
+            if(creep.carry.energy!=creep.carryCapacity && !creep.harvest(source[creep.memory.target])){
                 return;
             }
             if(!creep.memory.sendToId){

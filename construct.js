@@ -14,14 +14,23 @@ var construct={
         return room.controller.level;
     },
     road:function(pos1,pos2,err){
-        var retv=PathFinder.search(pos1,{pos2,err});
+        var retv=PathFinder.search(pos1,{pos:pos2,range:err});
         for(var pts in retv.path){
-            pts.room.createConstructionSite(pts,STRUCTURE_ROAD);
+            Game.rooms[retv.path[pts].roomName].createConstructionSite(retv.path[pts],STRUCTURE_ROAD);
+        }
+    },
+    autoRoad:function(_room){
+        var lvl=this.getLevel(_room);
+        if(lvl>=2){
+            var sources = _room.find(FIND_SOURCES);
+            var spawn =  _room.find(FIND_STRUCTURES,{filter: (structure) => {return (structure.structureType == STRUCTURE_SPAWN)}});
+            for(var index in sources){
+                this.road(spawn[0].pos,sources[index].pos,2);
+            }
         }
     },
     extension:function(_room){
-        var ext=_room.find(FIND_STRUCTURES,{
-                filter: (structure) => {return (structure.structureType == STRUCTURE_EXTENSION)}});
+        var ext= _room.find(FIND_STRUCTURES,{filter: (structure) => {return (structure.structureType == STRUCTURE_EXTENSION)}});
         var extToBuild=lvlext[this.getLevel(_room)]-ext.length;
         for(var position=0;extToBuild!=position;position+=1){
             var pts=_room.getPositionAt(position+15,_room.controller.pos.y+4);

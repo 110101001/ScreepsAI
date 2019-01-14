@@ -6,14 +6,22 @@ roles[0]='miner';
 roles[1]='builder';
 roles[2]='melee';
 
-var ratio={'miner':0.9,'builder':0.1,'melee':0.00};
+var ratio={'miner':0.85,'builder':0.15,'melee':0.00};
     
 
 var unitProduce={
     roleProduce:function (_role,spawn){
         
         if(_role=='miner'||_role=='builder'){
-            spawn.spawnCreep([WORK,CARRY,MOVE],_role+Game.time,{memory:{role:_role,target:0}});
+            if(spawn.room.energyCapacityAvailable<450){
+                spawn.spawnCreep([WORK,CARRY,MOVE],_role+Game.time,{memory:{role:_role,target:0}});
+            }
+            else if(spawn.room.energyCapacityAvailable<650){
+                spawn.spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE],_role+Game.time,{memory:{role:_role,target:0}});
+            }
+            else if(spawn.room.energyCapacityAvailable<850){
+                spawn.spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role,target:0}});
+            }
         }
         else if(_role=='melee'){
             spawn.spawnCreep([TOUGH,ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
@@ -22,7 +30,7 @@ var unitProduce={
     
     produce:function (spawn){
         var sum=unit.getUnitSum();
-
+        console.log('UnitSum:'+sum);
         for(var index in roles){
             if(unit.getRoleSum(roles[index])/sum<ratio[roles[index]]){
                 this.roleProduce(roles[index],spawn);

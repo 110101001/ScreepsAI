@@ -1,6 +1,6 @@
 var roleMiner = require('role.miner');
 var roleBuilder = require('role.builder');
-var roleMelee = require('role.melee');
+var roleMelee = require('role.melee'); 
 var construct = require('construct');
 var unitProduce = require('unit.produce');
 
@@ -11,11 +11,16 @@ module.exports.loop = function () {
             console.log('Clearing non-existing creep memory:', name);
         }
     }
-    var _room=Game.rooms['sim'];
-    construct.extension(_room);
-    
-    var spawn=Game.spawns['Spawn1'];
-    unitProduce.produce(spawn);
+    if(Game.time%100==0){
+        for(var _room in Game.rooms){
+            construct.extension(Game.rooms[_room]);
+            construct.autoRoad(Game.rooms[_room]);
+        }
+    }
+    if(Game.time%10==0){
+        var spawn=Game.spawns['Spawn1'];
+        unitProduce.produce(spawn);
+    }
     
     for(var name in Game.creeps){
         var unit=Game.creeps[name];

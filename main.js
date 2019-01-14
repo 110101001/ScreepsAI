@@ -1,14 +1,11 @@
 var roleMiner = require('role.miner');
 var roleBuilder = require('role.builder');
+var roleMelee = require('role.melee');
 var unitProduce = require('unit.produce');
-
-const unitCost=200;
 
 module.exports.loop = function () {
     var spawn=Game.spawns['Spawn1'];
-    if(spawn.energy>unitCost){
-       unitProduce.produce(spawn);
-    }
+    unitProduce.produce(spawn);
     
     for(var name in Game.creeps){
         var unit=Game.creeps[name];
@@ -19,6 +16,9 @@ module.exports.loop = function () {
             }
             else if(unit.memory.role=='builder'){
                 roleBuilder.run(unit);
+            }
+            else if(unit.memory.role=='melee'){
+                roleMelee.run(unit);
             }
         }
     }

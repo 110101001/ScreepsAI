@@ -1,17 +1,23 @@
 var unit=require('unit');
 
-var roles=new Array(2);
+var roles=new Array(3);
 
 roles[0]='miner';
 roles[1]='builder';
+roles[2]='melee';
 
-var ratio={'miner':0.7,'builder':0.3};
+var ratio={'miner':0.75,'builder':0.13,'melee':0.12};
     
 
 var unitProduce={
     roleProduce:function (_role,spawn){
-        if(_role=='miner'||_role=='builder')
-        spawn.spawnCreep([WORK,CARRY,MOVE],_role+Game.time,{memory:{role:_role,target:0}});
+        
+        if(_role=='miner'||_role=='builder'){
+            spawn.spawnCreep([WORK,CARRY,MOVE],_role+Game.time,{memory:{role:_role,target:0}});
+        }
+        else if(_role=='melee'){
+            spawn.spawnCreep([TOUGH,ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
+        }
     },
     
     produce:function (spawn){

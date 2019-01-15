@@ -27,7 +27,6 @@ var roleMiner={
                     creep.memory.failTry+=1;
                     if(creep.memory.failTry>=20){
                         creep.memory.role='builder';
-                        creep.name='builder'+Game.time;
                         creep.memory.failTry=0;
                     }
                 }

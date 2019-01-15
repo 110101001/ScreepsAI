@@ -18,12 +18,13 @@ var construct={
             for(var index in sources){
                 this.road(spawn[0].pos,sources[index].pos,2);
             }
+            this.road(spawn[0].pos,_room.controller.pos,2);
         }
     },
     extension:function(_room){
         var extNum=_room.find(FIND_STRUCTURES,{filter: (structure) => {return (structure.structureType == STRUCTURE_EXTENSION)}}).length + 
         _room.find(FIND_CONSTRUCTION_SITES,{filter: (structure) => {return (structure.structureType == STRUCTURE_EXTENSION)}}).length
-        var extToBuild=CONTROLLER_STRUCTURES['extension'][this.getlevel(_room)]-extNum;
+        var extToBuild=CONTROLLER_STRUCTURES['extension'][this.getLevel(_room)]-extNum;
         var spawnPos=_room.find(FIND_STRUCTURES,{filter: (structure) => {return (structure.structureType == STRUCTURE_SPAWN)}})[0].pos;
         if(extToBuild<1){
             return;
@@ -40,6 +41,7 @@ var construct={
         }
     },
     autoTower:function(_room){
+        var lvl=this.getLevel(_room);
         if(lvl>=3){
             var spawnPos=_room.find(FIND_STRUCTURES,{filter: (structure) => {return (structure.structureType == STRUCTURE_SPAWN)}})[0].pos;
             _room.createConstructionSite(spawnPos.x+10,spawnPos.y,STRUCTURE_TOWER);

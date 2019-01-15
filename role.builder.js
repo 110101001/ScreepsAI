@@ -1,7 +1,12 @@
 var roleBuilder = {
 
     run: function(creep) {
-
+        if(!creep.room.controller.my){
+            for(const i in Game.spawns){
+                creep.moveTo(Game.spawns[i]);
+                return;
+            }
+        }
 	    if(creep.memory.building && creep.carry.energy < 5) {
             creep.memory.building = false;
 	    }
@@ -36,10 +41,10 @@ var roleBuilder = {
             else if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_ENOUGH_RESOURCES) {
                 creep.moveTo(base[0]);
                 creep.memory.failTry+=1;
-                if(creep.memory.failTry>=20){
+                console.log('fail');
+                if(creep.memory.failTry>=10){
                         creep.memory.role='miner';
                         creep.memory.target=0;
-                        creep.name='miner'+Game.time;
                         creep.memory.failTry=0;
                     }
             }

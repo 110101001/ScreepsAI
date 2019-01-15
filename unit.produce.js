@@ -12,7 +12,7 @@ var armyRoles=new Array(2);
 armyRoles[0]='melee';
 armyRoles[1]='range';
 
-var ratio={'miner':0.80,'builder':0.15,'melee':0.05};//maintain a small guard before fully developed
+var ratio={'miner':0.75,'builder':0.25,'melee':0.00,'range':0.00};//maintain a small guard before fully developed
 
 var armyRatio={'melee':0.5,'range':0.5};//here is the real army
     
@@ -32,16 +32,32 @@ var unitProduce={
             }
         }
         else if(_role=='melee'){
-            spawn.spawnCreep([TOUGH,ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
+            if(spawn.room.energyCapacityAvailable<450){
+                spawn.spawnCreep([TOUGH,ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
+            }
+            else if(spawn.room.energyCapacityAvailable<650){
+                spawn.spawnCreep([TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
+            }
+            else if(spawn.room.energyCapacityAvailable<850){
+                spawn.spawnCreep([TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
+            }
         }
         else if(_role=='range'){
-            spawn.spawnCreep([RANGED_ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
+            if(spawn.room.energyCapacityAvailable<450){
+                spawn.spawnCreep([RANGED_ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
+            }
+            else if(spawn.room.energyCapacityAvailable<650){
+                spawn.spawnCreep([RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
+            }
+            else if(spawn.room.energyCapacityAvailable<850){
+                spawn.spawnCreep([RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
+            }
         }
     },
     
     produce:function (spawn){
-        var sum=unit.getUnitSum(spawn.room);
-        if(unit.getRoleSum('miner')<6*spawn.room.find(FIND_SOURCES).length){//before fully developed
+        var sum=unit.getRoleSum('miner')+unit.getRoleSum('builder');
+        if(unit.getRoleSum('miner')<6*spawn.room.find(FIND_SOURCES).length || unit.getRoleSum('builder')<2*spawn.room.find(FIND_SOURCES).length){//before fully developed
             for(var index in roles){
                 if(unit.getRoleSum(roles[index])/sum<ratio[roles[index]]){
                     this.roleProduce(roles[index],spawn);
@@ -53,6 +69,7 @@ var unitProduce={
         }
         else{//developed, produce armies
             var armySum=unit.getRoleSum('range')+unit.getRoleSum('melee');
+            if(armySum>10) return;
             for(var index in armyRoles){
                 if(unit.getRoleSum(armyRoles[index])/sum<armyRatio[armyRoles[index]]){
                     this.roleProduce(armyRoles[index],spawn);

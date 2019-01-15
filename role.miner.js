@@ -12,7 +12,10 @@ var roleMiner={
                         return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
                     }
                 });
-                creep.memory.sendToId=base[0].id;
+                if(base){
+                    creep.memory.sendToId=base[0].id;
+                    console.log(base[0]);
+                }
             }
             if(creep.memory.sendToId){
                 var sendTo=Game.getObjectById(creep.memory.sendToId);

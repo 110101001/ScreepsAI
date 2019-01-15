@@ -12,9 +12,9 @@ var roleMiner={
                         return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
                     }
                 });
-                if(base){
+
+                if(base.length){
                     creep.memory.sendToId=base[0].id;
-                    console.log(base[0]);
                 }
             }
             if(creep.memory.sendToId){
@@ -25,8 +25,10 @@ var roleMiner={
                 }
                 else if(creep.transfer(sendTo,RESOURCE_ENERGY)==ERR_FULL){
                     creep.memory.failTry+=1;
-                    if(creep.memory.failTry>=12){
-                        creep.memory.sendToId=0;
+                    if(creep.memory.failTry>=20){
+                        creep.memory.role='builder';
+                        creep.name='builder'+Game.time;
+                        creep.memory.failTry=0;
                     }
                 }
             }

@@ -18,6 +18,7 @@ module.exports.loop = function () {
         for(var _room in Game.rooms){
             construct.extension(Game.rooms[_room]);
             construct.autoRoad(Game.rooms[_room]);
+            construct.autoTower(Game.rooms[_room]);
         }
     }
     

@@ -10,6 +10,7 @@ var roleBuilder = {
 	    }
 
 	    if(creep.memory.building) {
+	        creep.memory.failTry=0;
 	        var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(targets.length&&creep.room.controller.ticksToDowngrade>3000) {
                 if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
@@ -31,6 +32,16 @@ var roleBuilder = {
 	       if(base.length){
             if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(base[0]);
+            }
+            else if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_ENOUGH_RESOURCES) {
+                creep.moveTo(base[0]);
+                creep.memory.failTry+=1;
+                if(creep.memory.failTry>=20){
+                        creep.memory.role='miner';
+                        creep.memory.target=0;
+                        creep.name='miner'+Game.time;
+                        creep.memory.failTry=0;
+                    }
             }
 	       }
 	    }

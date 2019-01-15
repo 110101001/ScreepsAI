@@ -1,5 +1,6 @@
 var roleMiner = require('role.miner');
 var roleBuilder = require('role.builder');
+var roleClaimler = require('role.claimler'); 
 var roleMelee = require('role.melee'); 
 var roleRange = require('role.range'); 
 var towerAct = require('tower');
@@ -21,7 +22,7 @@ module.exports.loop = function () {
             construct.autoTower(Game.rooms[_room]);
         }
     }
-    
+        
         for(var spawn in Game.spawns){
             unitProduce.produce(Game.spawns[spawn]);
         }
@@ -46,6 +47,9 @@ module.exports.loop = function () {
             }
             else if(unit.memory.role=='builder'){
                 roleBuilder.run(unit);
+            }
+            else if(unit.memory.role=='claimler'){
+                roleClaimler.run(unit);
             }
             else if(unit.memory.role=='melee'){
                 roleMelee.run(unit);

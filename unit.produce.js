@@ -19,9 +19,8 @@ var armyRatio={'melee':0.5,'range':0.5};//here is the real army
 
 var unitProduce={
     roleProduce:function (_role,spawn){
-        
         if(_role=='miner'||_role=='builder'){
-            if(spawn.room.energyCapacityAvailable<450){
+            if(spawn.room.energyCapacityAvailable<450||unit.getUnitSum(spawn.room)<5){
                 spawn.spawnCreep([WORK,CARRY,MOVE],'Foundation Unit'+Game.time,{memory:{role:_role,target:0}});
             }
             else if(spawn.room.energyCapacityAvailable<650){
@@ -63,7 +62,7 @@ var unitProduce={
                     this.roleProduce(roles[index],spawn);
                     return;
                 }
-            }
+            } 
             this.roleProduce('miner',spawn);
             return;
         }

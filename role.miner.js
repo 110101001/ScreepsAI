@@ -16,6 +16,9 @@ var roleMiner={
                 if(base.length){
                     creep.memory.sendToId=base[0].id;
                 }
+                else{
+                    creep.memory.role='builder';
+                }
             }
             if(creep.memory.sendToId){
                 var sendTo=Game.getObjectById(creep.memory.sendToId);
@@ -26,7 +29,7 @@ var roleMiner={
                 else if(creep.transfer(sendTo,RESOURCE_ENERGY)==ERR_FULL){
                     creep.memory.failTry+=1;
                     if(creep.memory.failTry>=20){
-                        creep.memory.role='builder';
+                        creep.memory.sendToId=0;
                         creep.memory.failTry=0;
                     }
                 }

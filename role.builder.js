@@ -34,21 +34,23 @@ var roleBuilder = {
                     return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.energy > creep.carryCapacity;
                 }
             });
-	       if(base.length){
-            if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(base[0]);
-            }
-            else if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_ENOUGH_RESOURCES) {
-                creep.moveTo(base[0]);
-                creep.memory.failTry+=1;
-                console.log('fail');
-                if(creep.memory.failTry>=10){
+	        if(base.length){
+                if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(base[0]);
+                }
+                else if(creep.withdraw(base[0],RESOURCE_ENERGY,creep.carryCapacity-creep.carry.energy) == ERR_NOT_ENOUGH_RESOURCES) {
+                    creep.moveTo(base[0]);
+                    creep.memory.failTry+=1;
+                }
+	       }
+	       else{
+	          creep.memory.failTry+=1; 
+	       }
+	       if(creep.memory.failTry>=5){
                         creep.memory.role='miner';
                         creep.memory.target=0;
                         creep.memory.failTry=0;
-                    }
             }
-	       }
 	    }
 	}
 };

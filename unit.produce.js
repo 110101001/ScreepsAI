@@ -1,18 +1,19 @@
 var unit=require('unit');
-
-var roles=new Array(4);
+var expand=require('expand');
+var roles=new Array(5);
 
 roles[0]='miner';
 roles[1]='builder';
-roles[2]='melee';
-roles[3]='range';
+roles[2]='claimler';
+roles[3]='melee';
+roles[4]='range';
 
 var armyRoles=new Array(2);
 
 armyRoles[0]='melee';
 armyRoles[1]='range';
 
-var ratio={'miner':0.75,'builder':0.25,'melee':0.00,'range':0.00};//maintain a small guard before fully developed
+var ratio={'miner':0.75,'builder':0.25,'claimler':0.0,'melee':0.00,'range':0.00};//maintain a small guard before fully developed
 
 var armyRatio={'melee':0.5,'range':0.5};//here is the real army
     
@@ -52,9 +53,18 @@ var unitProduce={
                 spawn.spawnCreep([RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
             }
         }
+        else if(_role=='claimler'){
+            spawn.spawnCreep([CLAIM,MOVE],_role+Game.time,{memory:{role:_role}});
+        }
     },
     
     produce:function (spawn){
+        if(Game.time%100==0){
+            if(expand.canExpand()){
+                this.roleProduce('claimler',spawn);
+                return;
+            }
+        }
         var sum=unit.getRoleSum('miner')+unit.getRoleSum('builder');
         if(unit.getRoleSum('miner')<5*spawn.room.find(FIND_SOURCES).length || unit.getRoleSum('builder')<2*spawn.room.find(FIND_SOURCES).length){//before fully developed
             for(var index in roles){

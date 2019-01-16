@@ -3,8 +3,13 @@ var roleClaimler={
         if(creep.room.my&&!creep.memory.target){
             var nearRooms=Game.map.describeExits(creep.room.name);
             for(var i in nearRooms){
-                if(!nearRooms[i].find(FIND_HOSTILE_CREEPS).length){
+                if(!nearRooms[i].find(FIND_HOSTILE_CREEPS).length && !nearRooms[i].my && !nearRooms[i].find(FIND_MY_CREEPS,{
+                    filter: (myCreep) => {
+                        return (myCreep.memory.role==claimler);
+                    }
+                }).length){
                     creep.memory.target=nearRooms[i].id;
+                    return;
                 }
             }
         }

@@ -6,7 +6,6 @@ var roleMiner={
                 return;
             }
             if(!creep.memory.sendToId){
-                creep.memory.failTry=0;
                 var base=creep.room.find(FIND_STRUCTURES,{
                     filter: (structure) => {
                         return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && (structure.energy < structure.energyCapacity);
@@ -14,6 +13,7 @@ var roleMiner={
                 });
 
                 if(base.length){
+                    creep.memory.failTry=0;
                     creep.memory.sendToId=base[0].id;
                 }
                 else{
@@ -26,12 +26,12 @@ var roleMiner={
             }
             if(creep.memory.sendToId){
                 var sendTo=Game.getObjectById(creep.memory.sendToId);
+                if(sendTo.energy==sendTo.energyCapacity){
+                    creep.memory.sendToId=0;
+                    return;
+                }
                 if(creep.transfer(sendTo,RESOURCE_ENERGY)==ERR_NOT_IN_RANGE){
                     creep.moveTo(sendTo);
-                    
-                }
-                else if(creep.transfer(sendTo,RESOURCE_ENERGY)==ERR_FULL){
-                    creep.memory.sendToId=0;
                 }
             }
         }

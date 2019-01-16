@@ -31,7 +31,7 @@ var construct={
         }
         for(var i=0;i<=6;i++){
             for(var j=0;j<=10;j+=2){
-                if(!_room.createConstructionSite(spawnPos.x-10+i,spawnPos.y-5+j+i%2,STRUCTURE_EXTENSION)){
+                if(!_room.createConstructionSite(spawnPos.x-5+i,spawnPos.y-5+j+i%2,STRUCTURE_EXTENSION)){
                     extToBuild-=1;
                     if(extToBuild==0){
                         return;

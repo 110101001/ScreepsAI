@@ -35,10 +35,10 @@ var unitProduce={
             if(spawn.room.energyCapacityAvailable<450){
                 spawn.spawnCreep([TOUGH,ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
             }
-            else if(spawn.room.energyCapacityAvailable<650){
+            else if(spawn.room.energyCapacityAvailable<850){
                 spawn.spawnCreep([TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
             }
-            else if(spawn.room.energyCapacityAvailable<850){
+            else if(spawn.room.energyCapacityAvailable<1250){
                 spawn.spawnCreep([TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
             }
         }
@@ -46,10 +46,10 @@ var unitProduce={
             if(spawn.room.energyCapacityAvailable<450){
                 spawn.spawnCreep([RANGED_ATTACK,MOVE],_role+Game.time,{memory:{role:_role}});
             }
-            else if(spawn.room.energyCapacityAvailable<650){
+            else if(spawn.room.energyCapacityAvailable<850){
                 spawn.spawnCreep([RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
             }
-            else if(spawn.room.energyCapacityAvailable<850){
+            else if(spawn.room.energyCapacityAvailable<1250){
                 spawn.spawnCreep([RANGED_ATTACK,RANGED_ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE],_role+Game.time,{memory:{role:_role}});
             }
         }
@@ -60,7 +60,7 @@ var unitProduce={
     
     produce:function (spawn){
         if(Game.time%100==0){
-            if(expand.canExpand()){
+            if(expand.canExpand(spawn.room)){
                 this.roleProduce('claimler',spawn);
                 return;
             }
@@ -78,7 +78,7 @@ var unitProduce={
         }
         else{//developed, produce armies
             var armySum=unit.getRoleSum('range')+unit.getRoleSum('melee');
-            if(armySum>10) return;
+            if(armySum>8) return;
             for(var index in armyRoles){
                 if(unit.getRoleSum(armyRoles[index])/sum<armyRatio[armyRoles[index]]){
                     this.roleProduce(armyRoles[index],spawn);

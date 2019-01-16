@@ -9,12 +9,19 @@ var roleMiner={
                 creep.memory.failTry=0;
                 var base=creep.room.find(FIND_STRUCTURES,{
                     filter: (structure) => {
-                        return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
+                        return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_TOWER) && (structure.energy < structure.energyCapacity);
                     }
                 });
 
                 if(base.length){
                     creep.memory.sendToId=base[0].id;
+                }
+                else{
+                    creep.memory.failTry+=1;
+                    if(creep.memory.failTry>=5){
+                        creep.memory.role='builder';
+                        creep.memory.failTry=0;
+                    }
                 }
             }
             if(creep.memory.sendToId){
@@ -24,11 +31,7 @@ var roleMiner={
                     
                 }
                 else if(creep.transfer(sendTo,RESOURCE_ENERGY)==ERR_FULL){
-                    creep.memory.failTry+=1;
-                    if(creep.memory.failTry>=20){
-                        creep.memory.role='builder';
-                        creep.memory.failTry=0;
-                    }
+                    creep.memory.sendToId=0;
                 }
             }
         }

@@ -31,7 +31,7 @@ var unitProduce={
                 spawn.spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
             }
             else if(spawn.room.energyCapacityAvailable<900){
-                spawn.spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
+                spawn.spawnCreep([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
             }
         }
         else if(_role=='melee'){
@@ -64,7 +64,7 @@ var unitProduce={
     },
     
     produce:function (spawn){
-        if(Game.time%600==0){
+        /*if(Game.time%600==0){
             spawn.room.memory.expanding=0;
         }
         if(Game.time%10==0 && spawn.room.memory.expanding==0){
@@ -72,7 +72,7 @@ var unitProduce={
                 this.roleProduce('claimler',spawn);
                 return;
             }
-        }
+        }*/
         var sum=unit.getRoleSum('miner')+unit.getRoleSum('builder');
         if(unit.getRoleSum('miner')<5*spawn.room.find(FIND_SOURCES).length || unit.getRoleSum('builder')<2*spawn.room.find(FIND_SOURCES).length){//before fully developed
             for(var index in roles){
@@ -86,7 +86,7 @@ var unitProduce={
         }
         else{//developed, produce armies
             var armySum=unit.getRoleSum('range')+unit.getRoleSum('melee');
-            if(armySum>0) return;
+            if(armySum>8) return;
             for(var index in armyRoles){
                 if(unit.getRoleSum(armyRoles[index])/sum<armyRatio[armyRoles[index]]){
                     this.roleProduce(armyRoles[index],spawn);

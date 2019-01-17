@@ -1,7 +1,7 @@
 var towerAct={
     run:function(tower){
         var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => (structure.hits < structure.hitsMax && structure.my)
+            filter: (structure) => (structure.hits < structure.hitsMax && (structure.structureType == STRUCTURE_EXTENSION||structure.structureType == STRUCTURE_ROAD))
         });
         if(closestDamagedStructure) {
             tower.repair(closestDamagedStructure);

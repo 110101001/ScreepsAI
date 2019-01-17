@@ -1,6 +1,6 @@
 var roleClaimler={
     run:function(creep){
-        if(creep.room.my){
+        if(creep.room.controller.my){
             creep.moveTo(Game.flags['exp']);
         }
         /*if(creep.room.my&&!creep.memory.target){
@@ -19,7 +19,12 @@ var roleClaimler={
         else{
             creep.memory.target=creep.room.controller.id;
             if(creep.claimController(Game.getObjectById(creep.memory.target))==ERR_NOT_IN_RANGE){
-                moveTo(Game.getObjectById(creep.memory.target));
+                creep.moveTo(Game.getObjectById(creep.memory.target));
+            }
+            else if(creep.claimController(Game.getObjectById(creep.memory.target))==ERR_GCL_NOT_ENOUGH){
+                if(creep.reserveController(Game.getObjectById(creep.memory.target))==ERR_NOT_IN_RANGE){
+                    creep.moveTo(Game.getObjectById(creep.memory.target));
+                }
             }
         }
     }

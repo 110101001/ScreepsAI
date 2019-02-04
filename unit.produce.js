@@ -27,11 +27,14 @@ var unitProduce={
             else if(spawn.room.energyCapacityAvailable<550){
                 spawn.spawnCreep([WORK,WORK,CARRY,CARRY,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
             }
-            else if(spawn.room.energyCapacityAvailable<650){
+            else if(spawn.room.energyCapacityAvailable<750){
                 spawn.spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
             }
-            else if(spawn.room.energyCapacityAvailable<900){
+            else if(spawn.room.energyCapacityAvailable<1000){
                 spawn.spawnCreep([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
+            }
+            else{
+                spawn.spawnCreep([WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE],'Foundation Unit '+Game.time,{memory:{role:_role,target:0}});
             }
         }
         else if(_role=='melee'){
@@ -88,7 +91,7 @@ var unitProduce={
             var armySum=unit.getRoleSum('range')+unit.getRoleSum('melee');
             if(armySum>8) return;
             for(var index in armyRoles){
-                if(unit.getRoleSum(armyRoles[index])/sum<armyRatio[armyRoles[index]]){
+                if(unit.getRoleSum(armyRoles[index])/armySum<armyRatio[armyRoles[index]]){
                     this.roleProduce(armyRoles[index],spawn);
                     return;
                 }

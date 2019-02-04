@@ -26,6 +26,10 @@ var roleMiner={
             }
             if(creep.memory.sendToId){
                 var sendTo=Game.getObjectById(creep.memory.sendToId);
+                if(sendTo==null){
+                    creep.memory.sendToId=0;
+                    return;
+                }
                 if(sendTo.energy==sendTo.energyCapacity){
                     creep.memory.sendToId=0;
                     return;

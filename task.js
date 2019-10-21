@@ -1,5 +1,5 @@
 var task={
-    addTask: function(taskType,sourceID,targetID){
+    addTask: function(importance,taskType,sourceID,targetID){
         var newTask={
             taskType:taskType,
             sourceID:sourceID,
@@ -9,8 +9,8 @@ var task={
     },
     assignTask: function(creep,task){
         creep.memory.task=task.taskType;
-        creep.memory.sourceID=task.sourceID;
-        creep.memory.targetID=task.targetID;
+        creep.memory.source=task.sourceID;
+        creep.memory.target=task.targetID;
     }
 }
 

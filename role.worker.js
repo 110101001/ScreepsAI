@@ -25,23 +25,24 @@ var worker = {
     },
 
     run: function (creep) {
-        var state = stateMachine.calcWorkerState(creep);
-        switch (state) {
+        stateMachine.calcWorkerState(creep);
+        switch (creep.memory.state) {
             case Memory.workState.state_idle:
+                creep.memory.task=-1;
                 break;
             case Memory.workState.state_goToSource:
-                creep.moveTo(Game.getObjById(creep.memory.source));
+                creep.moveTo(Game.getObjectById(creep.memory.source).pos);
                 break;
             case Memory.workState.state_haverst:
-                creep.haverst(Game.getObjById(creep.memory.source));
+                creep.harvest(Game.getObjectById(creep.memory.source));
                 break;
             case Memory.workState.state_withdraw:
                 break;
             case Memory.workState.state_transfer:
-                creep.transfer(Game.getObjById(creep.memory.target), RESOURCE_ENERGY);
+                creep.transfer(Game.getObjectById(creep.memory.target), RESOURCE_ENERGY);
                 break;
             case Memory.workState.state_goToTarget:
-                creep.moveTo(Game.getObjById(creep.memory.target));
+                creep.moveTo(Game.getObjectById(creep.memory.target).pos);
                 break;
             case Memory.workState.state_build:
                 break;

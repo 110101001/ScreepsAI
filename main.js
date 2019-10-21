@@ -7,6 +7,9 @@ function memoryInit() {
         //initTasks
         worker.init();
         Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], 'Fun', { memory: { role: Memory.role.role_worker,state: Memory.workState.state_idle } });
+        var source = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
+        var t = task.addTask(Memory.task.task_mine, source[0].id, Game.spawns['Spawn1'].id);
+        task.assignTask(Game.creeps['Fun'], t);
     }
 }
 
@@ -23,9 +26,6 @@ module.exports.loop = function () {
     if (Game.time % 5 == 0) {
 
     }
-    var source = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
-    var t = task.addTask(Memory.task.task_mine, source[0].id, Game.spawns['Spawn1'].id);
-    task.assignTask(Game.creeps['Fun'], t);
 
     for (var name in Game.creeps) {
         var unit = Game.creeps[name];

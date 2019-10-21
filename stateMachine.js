@@ -40,7 +40,7 @@ function IsCarryEnergyOnly(creep){
     }
 }
 function IsNearToSource(creep) {
-    if (creep.pos.isNearTo(Game.getObjectById(creep.memory.sourceID))) {
+    if (creep.pos.isNearTo(Game.getObjectById(creep.memory.source))) {
         return true;
     }
     else {
@@ -48,7 +48,7 @@ function IsNearToSource(creep) {
     }
 }
 function IsNearToTarget(creep) {
-    if (creep.pos.isNearTo(Game.getObjectById(creep.memory.targetID))) {
+    if (creep.pos.isNearTo(Game.getObjectById(creep.memory.target))) {
         return true;
     }
     else {
@@ -56,7 +56,7 @@ function IsNearToTarget(creep) {
     }
 }
 function IsTargetFull(creep) {
-    if (Game.getObjectById(creep.memory.targetID).store.getFreeCapacity() == 0) {
+    if (Game.getObjectById(creep.memory.target).store.getFreeCapacity() == 0) {
         return true;
     }
     else {
@@ -64,7 +64,7 @@ function IsTargetFull(creep) {
     }
 }
 function IsSourceEmpty(creep) {
-    if (Game.getObjectById(creep.memory.sourceID).store.getUsedCapacity() = 0) {
+    if (Game.getObjectById(creep.memory.source).store.getUsedCapacity() = 0) {
         return true;
     }
     else {
@@ -72,7 +72,7 @@ function IsSourceEmpty(creep) {
     }
 }
 function IsEnergySourceEmpty(creep) {
-    if (Game.getObjectById(creep.memory.sourceID).energy = 0) {
+    if (Game.getObjectById(creep.memory.source).energy == 0) {
         return true;
     }
     else {
@@ -80,7 +80,7 @@ function IsEnergySourceEmpty(creep) {
     }
 }
 function isSourceInvalid(creep){
-    if(Game.getObjectById(creep.memory.sourceID)==null){
+    if(Game.getObjectById(creep.memory.source)==null){
         return true;
     }
     else{
@@ -88,7 +88,7 @@ function isSourceInvalid(creep){
     }
 }
 function IsTargetControllerMaxLevel(creep) {
-    if (Game.getObjectById(creep.memory.targetID).level == 8) {
+    if (Game.getObjectById(creep.memory.target).level == 8) {
         return true;
     }
     else {
@@ -96,7 +96,7 @@ function IsTargetControllerMaxLevel(creep) {
     }
 }
 function IsTargetControllerDecayTimeHigh(creep) {
-    if (Game.getObjectById(creep.memory.targetID).ticksToDowngrade > 1000) {
+    if (Game.getObjectById(creep.memory.target).ticksToDowngrade > 1000) {
         return true;
     }
     else {
@@ -104,7 +104,7 @@ function IsTargetControllerDecayTimeHigh(creep) {
     }
 }
 function isTargetInvalid(creep){
-    if(Game.getObjectById(creep.memory.targetID)==null){
+    if(Game.getObjectById(creep.memory.target)==null){
         return true;
     }
     else{
@@ -112,7 +112,7 @@ function isTargetInvalid(creep){
     }
 }
 function IsNoTask(creep) {
-    if (creep.task == -1) {
+    if (creep.memory.task == -1) {
         return true;
     }
     else {
@@ -155,74 +155,74 @@ function IsPickup(creep) {
 
 var stateMachine = {
     calcWorkerState: function (creep) {
-        switch (creep.state) {
+        switch (creep.memory.state) {
             case Memory.workState.state_idle:
                 if (!IsNoTask(creep)) {
                     if (IsManyCargo(creep)&&IsCarryEnergyOnly(creep)) {
-                        creep.state = Memory.workState.state_goToSource;
+                        creep.memory.state = Memory.workState.state_goToTarget;
                     }
                     else {
-                        creep.state = Memory.workState.state_goToTarget;
+                        creep.memory.state = Memory.workState.state_goToSource;
                     }
                 }
                 break;
             case Memory.workState.state_goToSource:
                 if(IsNearToSource(creep)){
                     if(IsMine(creep)){
-                        creep.state=Memory.workState.state_haverst;
+                        creep.memory.state=Memory.workState.state_haverst;
                     }
                     else if(IsPickup(creep)){
-                        creep.state=Memory.workState.state_pickup;
+                        creep.memory.state=Memory.workState.state_pickup;
                     }
-                    else if(Game.getObjectById(creep.memory.sourceID).structureType==undefined){
-                        creep.state=Memory.workState.state_haverst;
+                    else if(Game.getObjectById(creep.memory.source).structureType==undefined){
+                        creep.memory.state=Memory.workState.state_haverst;
                     }
                     else{
-                        creep.state=Memory.workState.state_withdraw;
+                        creep.memory.state=Memory.workState.state_withdraw;
                     }
                 }
                 break;
             case Memory.workState.state_haverst:
                 if(IsFullCargo(creep)||IsEnergySourceEmpty(creep)){
-                    creep.state=Memory.workState.state_goToTarget;
+                    creep.memory.state=Memory.workState.state_goToTarget;
                 }
                 break;
             case Memory.workState.state_withdraw:
                     if(IsFullCargo(creep)||IsSourceEmpty(creep)){
-                        creep.state=Memory.workState.state_goToTarget;
+                        creep.memory.state=Memory.workState.state_goToTarget;
                     }
                 break;
             case Memory.workState.state_transfer:
                     if(IsEmptyCargo(creep)||IsTargetFull(creep)){
-                        creep.state=Memory.workState.state_idle;
+                        creep.memory.state=Memory.workState.state_idle;
                     }
                 break;
             case Memory.workState.state_goToTarget:
                     if(IsNearToTarget(creep)){
                         if(IsMine(creep)||IsPickup(creep)){
-                            creep.state=Memory.workState.state_transfer;
+                            creep.memory.state=Memory.workState.state_transfer;
                         }
                         else if(IsBuild(creep)){
-                            creep.state=Memory.workState.state_build;
+                            creep.memory.state=Memory.workState.state_build;
                         }
                         else if(IsUpgrade(creep)){
-                            creep.state=Memory.workState.state_upgrade;
+                            creep.memory.state=Memory.workState.state_upgrade;
                         }
                     }
                 break;
             case Memory.workState.state_build:
                     if(IsEmptyCargo(creep)||isTargetInvalid(creep)){
-                        creep.state=Memory.workState.state_idle;
+                        creep.memory.state=Memory.workState.state_idle;
                     }
                 break;
             case Memory.workState.state_upgrade:
                     if(IsEmptyCargo(creep)||(IsTargetControllerMaxLevel(creep)&&IsTargetControllerDecayTimeHigh(creep))){
-                        creep.state=Memory.workState.state_idle;
+                        creep.memory.state=Memory.workState.state_idle;
                     }
                 break;
             case Memory.workState.state_pickup:
                     if(IsFullCargo(creep)||isSourceInvalid(creep)){
-                        creep.state=Memory.workState.state_goToTarget;
+                        creep.memory.state=Memory.workState.state_goToTarget;
                     }
                 break;
         }

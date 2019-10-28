@@ -1,12 +1,12 @@
 var task=require('task');
 
 function getMaxMiner(source){
-    const terrain = new Room.Terrain(room.name);
-    var nearBy=new Array((1,1),(1,0),(1,-1),(0,1),(0,-1),(-1,1),(-1,0),(-1,-1));
+    const terrain = new Room.Terrain(source.room.name);
+    var nearBy=new Array({x:1,y:1},{x:1,y:0},{x:1,y:-1},{x:0,y:1},{x:0,y:-1},{x:-1,y:1},{x:-1,y:0},{x:-1,y:-1});
     var maxMiner=0;
     for(var offset in nearBy){
-        if(source.room.memory.terrain.get(
-            source.pos.x+nearBy[offset][0],source.pos.y+nearBy[offset][1]
+        if(terrain.get(
+            source.pos.x+nearBy[offset].x,source.pos.y+nearBy[offset].y
             )!=TERRAIN_MASK_WALL){
                 maxMiner+=1;
             }
@@ -23,9 +23,6 @@ function EnergyNeed(room){
     }
 }
 
-function EstimateMineTime(creep,source,target){
-    
-}
 
 function CalcMineDesire(creep){
     var energyRequire = EnergyNeed(creep.room);
@@ -55,7 +52,6 @@ var taskSchedule={
         }
     },
     roomInit:function(room){
-        room.memory.
 
         room.memory.task=Memory.roomTask.task_idle;
         room.memory.stage=Memory.roomStage.L1;
@@ -66,15 +62,21 @@ var taskSchedule={
         room.memory.estimatedCost=0;
         room.memory.estimatedIncome=0;
         
-        room.memory.sourceList=new Set();
+        room.memory.sourceList=new Array();
         var source=room.find(FIND_SOURCES);
         for(var sourceName in source){
-            room.memory.sourceList.add({
-                id:source[sourceName].id,
+            console.log(
+                source[sourceName].id,
+                source[sourceName].pos,
+                getMaxMiner(source[sourceName]),
+                source[sourceName].energyCapacity 
+            );
+            room.memory.sourceList[source[sourceName].id]={
                 pos:source[sourceName].pos,
                 maxMiner: getMaxMiner(source[sourceName]),
+                miner: new Array(),
                 expectEnergy:source[sourceName].energyCapacity 
-            })
+            };
         }
             
     },

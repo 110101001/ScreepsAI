@@ -67,6 +67,7 @@ var timeEstimate = {
         var ETAW =0;
         if (expMiner(source, ETAS) >= source.room.memory.sourceList[source.id].maxMiner) {
             ETAW=expMineWait(source,time+ETAS);
+            //console.log('wait'+ETAW);
         }
         var ETAH=0;
         if (source.room.memory.sourceList[source.id].expectEnergy > creep.store.getFreeCapacity()) {

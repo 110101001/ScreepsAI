@@ -1,5 +1,6 @@
 var worker = require('role.worker');
 var task = require('task');
+var construction = require('construction')
 var TS = require('taskSchedule');
 var TE = require('timeEstimate');
 
@@ -9,8 +10,12 @@ function memoryInit() {
         //initTasks
         TS.init();
         worker.init();
-        TS.roomInit(Game.spawns['Spawn1'].room);
-        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], 'Fun', { memory: { role: Memory.role.role_worker,state: Memory.workState.state_idle,bodyParts: 1,moveParts:1,workParts:1,task:-1 } });
+        construction.init();
+        for(var spawn in Game.spawns){
+            TS.roomInit(Game.spawns[spawn].room);
+            construction.structureInit(Game.spawns[spawn]);
+        }
+        //Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], 'Fun', { memory: { role: Memory.role.role_worker,state: Memory.workState.state_idle,bodyParts: 1,moveParts:1,workParts:1,task:-1 } });
 //       var source = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
     }
 }
@@ -26,9 +31,9 @@ module.exports.loop = function () {
         }
     }
     if (Game.time % 5 == 0) {
-
+        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], Game.time, { memory: { role: Memory.role.role_worker,state: Memory.workState.state_idle,bodyParts: 1,moveParts:1,workParts:1,task:-1 } });
     }
-
+    console.log(Game.time);
     for (var name in Game.creeps) {
         var unit = Game.creeps[name];
         if (unit.spawning == false) {

@@ -16,8 +16,8 @@ function getMaxMiner(source) {
 }
 
 function EnergyNeed(room) {
-    if (room.energyAvailable < room.memory.estimateCost - room.memory.expectedIncome) {
-        return room.memory.estimateCost - room.memory.expectedIncome - room.energyAvailable;
+    if (room.energyAvailable < room.memory.expectCost - room.memory.expectIncome) {
+        return room.memory.expectCost - room.memory.expectIncome - room.energyAvailable;
     }
     else {
         return 0;
@@ -25,11 +25,12 @@ function EnergyNeed(room) {
 }
 
 //Estimate the time to fininsh mining and transporting and the income, then give a desire value based on the two values and energy requirment
+//Also provide everything to assign a task
 function CalcMineDesire(creep) {
     var energyRequire = EnergyNeed(creep.room);
-    if(energyRequire<=0){
-        return {desire:0,task: {}};
-    }
+    //if (energyRequire <= 0) {
+    //    return { desire: 0, task: {} };
+    //}
 
     //find source
     var sources = creep.room.find(FIND_SOURCES, {
@@ -37,20 +38,20 @@ function CalcMineDesire(creep) {
             return (source.room.memory.sourceList[source.id].expectEnergy > 0);
         }
     });
-    if(sources==undefined){
-        return {desire:0,task: {}};
+    if (sources == undefined) {
+        return { desire: 0, task: {} };
     }
     var bestSource = sources[0];
     var lowestTime;
     var sourcePath;
     var path;
-    for(var source in sources){
-        var path=creep.pos.findPathTo(sources[source]);
-        var time=TE.estimateMineTime(creep,sources[source],path,{},{}).total;
-        if(lowestTime == undefined || time < lowestTime){
-            lowestTime=time;
-            bestSource=sources[source];
-            sourcePath=path;
+    for (var source in sources) {
+        var path = creep.pos.findPathTo(sources[source]);
+        var time = TE.estimateMineTime(creep, sources[source], path, {}, {}).total;
+        if (lowestTime == undefined || time < lowestTime) {
+            lowestTime = time;
+            bestSource = sources[source];
+            sourcePath = path;
         }
     }
 
@@ -58,17 +59,36 @@ function CalcMineDesire(creep) {
     //find target
     var target = bestSource.pos.findClosestByRange(FIND_STRUCTURES, {
         filter: (structure) => {
-            return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && (structure.energyCapacity - structure.energy >= 50);
+            return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && (structure.energyCapacity - structure.energy - Memory.structures[structure.id].expectEnergy >= 50);
         }
     });
-    if(target==undefined){
-        return {desire:0,task: {}};
+    if (target == undefined) {
+        return { desire: 0, task: {} };
     }
-    
-    var miningPoint = new RoomPosition(sourcePath[sourcePath.length-2].x,sourcePath[sourcePath.length-2].y,creep.room.name);
-    var targetPath= miningPoint.findPathTo(target);
-    var time=TE.estimateMineTime(creep,bestSource,sourcePath,target,targetPath).total;
-    return {desire:0,task: {}};
+
+    var miningPoint = new RoomPosition(sourcePath[sourcePath.length - 2].x, sourcePath[sourcePath.length - 2].y, creep.room.name);
+    var targetPath = miningPoint.findPathTo(target);
+    var time = TE.estimateMineTime(creep, bestSource, sourcePath, target, targetPath);
+
+    var income;
+    if (bestSource.room.memory.sourceList[bestSource.id].expectEnergy > creep.store.getFreeCapacity()) {
+        income = creep.store.getCapacity();
+    }
+    else {
+        income = bestSource.room.memory.sourceList[bestSource.id].expectEnergy;
+    }
+    var desire = (income + energyRequire) / time.total;
+    return {
+        desire: desire,
+        task: {
+            type: Memory.task.task_mine,
+            source: bestSource,
+            target: target,
+            timeStart: Game.time + time.source + time.wait,
+            timeEnd: Game.time + time.source + time.wait + time.harvest,
+            amount: income
+        }
+    };
 }
 
 var taskSchedule = {
@@ -94,11 +114,11 @@ var taskSchedule = {
         room.memory.task = Memory.roomTask.task_idle;
         room.memory.stage = Memory.roomStage.L1;
 
-        room.memory.spawnTaskList = new Set();
+        room.memory.spawnTaskList = {};
         //as for army..., they should be directly controlled by central authority
 
-        room.memory.estimatedCost = 0;
-        room.memory.estimatedIncome = 0;
+        room.memory.expectCost = 0;
+        room.memory.expectIncome = 0;
 
         room.memory.sourceList = {};
 
@@ -113,37 +133,22 @@ var taskSchedule = {
             room.memory.sourceList[source[sourceName].id] = {
                 pos: source[sourceName].pos,
                 maxMiner: getMaxMiner(source[sourceName]),
-                miner: new Array(),
+                miner: {},
                 expectEnergy: source[sourceName].energyCapacity
             };
         }
 
     },
-    constructGen: function (room) {
-        //Normal Develop Sequence:
-        //RCL1->RCL2->road1->extension5->RCL3->Tower1->road2->extension10->RCL4->extension20->
-        switch (room.memory.task) {
-            case Memory.roomTask.task_idle:
-                switch (room.memory.stage) {
-                    case Memory.roomStage.L1://RCL1->RCL2
-                        //do nothing but to wait for upgrade
-                        break;
-                }
-                break;
-        }
-
-    },
-    spawnTaskGen: function (room) {
-
-    },
     workerTaskArrange: function (creep) {
         //Calc desire for every task
-        var task;
+        var taskData;
         var desire;
         var res = CalcMineDesire(creep);
-        desire=res.desire;
-        task=res.task;
-
+        desire = res.desire;
+        taskData = res.task;
+        if (desire != 0) {
+            task.assignTaskMine(creep, taskData);
+        }
     }
 };
 

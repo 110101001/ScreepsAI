@@ -13,18 +13,14 @@ var worker = {
             state_upgrade: 7,
             state_pickup: 8,
         };
-        Memory.task = {
-            task_mine: 0,
-            task_build: 1,
-            task_upgrade: 2,
-            task_pickup: 3,
-        };
-        Memory.role = {
-            role_worker: 0
-        };
-        Memory.constant = {
-            reusePath: 4
-        }
+        Memory.task.task_mine = 0;
+        Memory.task.task_build = 1;
+        Memory.task.task_upgrade = 2;
+        Memory.task.task_pickup = 3;
+
+        Memory.role.role_worker = 0
+
+        Memory.constant.reusePath = 4;
     },
 
     run: function (creep) {
@@ -45,7 +41,7 @@ var worker = {
                     else {
                         Memory.structures[creep.memory.target].expectEnergy -= creep.memory.amount;
                     }
-                    creep.room.memory.expectIncome-=creep.memory.amount;
+                    creep.room.memory.expectIncome -= creep.memory.amount;
                     break;
                 case Memory.workState.state_goToTarget:
                     creep.memory.targetPath = undefined;

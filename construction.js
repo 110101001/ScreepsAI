@@ -3,8 +3,10 @@ var construction={
         Memory.structures={};
     },
     structureInit:function(structure){
-        Memory.structures[structure.id]={};
         Memory.structures[structure.id].expectEnergy=0;
+    },
+    spawnInit:function(spawn){
+        spawn.memory.task=-1;
     },
     constructGen: function (room) {
         //Normal Develop Sequence:

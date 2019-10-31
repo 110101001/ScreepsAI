@@ -1,12 +1,19 @@
-var production={
-
+var production = {
+    designWorker: function (room) {
+        return {
+            part: [WORK, CARRY, MOVE],
+            workParts: 1,
+            moveParts: 1,
+            bodyParts: 3,
+        };
+    },
     spawnTaskGen: function (room) {
-        switch(room.memory.task){
+        switch (room.memory.task) {
             case task_idle:
 
-            break;
+                break;
         }
     }
 }
 
-module.exports=production;
+module.exports = production;

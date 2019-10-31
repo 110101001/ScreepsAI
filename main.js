@@ -7,6 +7,13 @@ var TE = require('timeEstimate');
 function memoryInit() {
     if (Memory.Begin == undefined) {
         Memory.Begin = 0;
+        //main init
+        Memory.constant={};
+        Memory.structures={};
+        Memory.task={};
+        Memory.role={};
+
+
         //initTasks
         TS.init();
         worker.init();

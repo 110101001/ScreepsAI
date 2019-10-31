@@ -1,5 +1,7 @@
 var task = require('task');
+var production = require('production');
 var TE = require('timeEstimate');
+
 
 function getMaxMiner(source) {
     const terrain = new Room.Terrain(source.room.name);
@@ -91,6 +93,22 @@ function CalcMineDesire(creep) {
     };
 }
 
+function calcSpawnWorkerDesire(spawn) {
+    var shortage = spawn.room.memory.maxWorkPartsCount - spawn.room.memory.workPartsCount;
+    if (shortage <= 0) {
+        return {
+            desire: 0,
+            taskData: {}
+        };
+    }
+    return {
+        desire: shortage,
+        taskData: {
+            type: Memory.task.task_spawnWorker,
+            worker: production.designWorker(spawn.room)
+        }
+    };
+}
 var taskSchedule = {
     init: function () {
         Memory.roomTask = {
@@ -98,7 +116,7 @@ var taskSchedule = {
             task_defence: 1,
             task_retreat: 2,
             task_army: 3,
-        }
+        };
         Memory.roomStage = {
             L1: 0,
             L2: 1,
@@ -107,7 +125,7 @@ var taskSchedule = {
             L5: 4,
             L6: 5,
             L7: 6,
-        }
+        };
     },
     roomInit: function (room) {
 
@@ -115,7 +133,6 @@ var taskSchedule = {
         room.memory.stage = Memory.roomStage.L1;
 
         room.memory.spawnTaskList = {};
-        //as for army..., they should be directly controlled by central authority
 
         room.memory.expectCost = 0;
         room.memory.expectIncome = 0;
@@ -138,16 +155,26 @@ var taskSchedule = {
             };
         }
 
+        room.memory.workPartsCount = 0;
+        room.memory.maxWorkPartsCount = source.length() * 5 + 10;
+
     },
     workerTaskArrange: function (creep) {
         //Calc desire for every task
-        var taskData;
-        var desire;
+
         var res = CalcMineDesire(creep);
-        desire = res.desire;
-        taskData = res.task;
+        var taskData = res.task;
+        var desire = res.desire;;
         if (desire != 0) {
             task.assignTaskMine(creep, taskData);
+        }
+    },
+    spawnTaskArrange: function (spawn) {
+        var res = calcSpawnWorkerDesire();
+        var taskData = res.task;
+        var desire = res.desire;;
+        if(desire !=0){
+            task.assignTaskSpawnWorker(spawn,taskData);
         }
     }
 };

@@ -153,12 +153,25 @@ function IsPickup(creep) {
 }
 
 function IsSpawnWorker(spawn) {
-    if (spawn.memory.state = Memory.task.task_spawnWorker) {
+    if (spawn.memory.task == Memory.task.task_spawnWorker) {
         return true;
     }
     else {
         return false;
     }
+}
+
+function canSpawn(spawn) {
+    if (spawn.room.energyAvailable >= spawn.memory.cost) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function IsSpawning(spawn) {
+    return spawn.spawning;
 }
 
 var stateMachine = {
@@ -176,6 +189,7 @@ var stateMachine = {
                 break;
             case Memory.workState.state_goToSource:
                 if (IsNearToSource(creep)) {
+                    creep.memory.sourcePath = undefined;
                     if (IsMine(creep)) {
                         creep.memory.state = Memory.workState.state_haverst;
                     }
@@ -192,6 +206,7 @@ var stateMachine = {
                 break;
             case Memory.workState.state_haverst:
                 if (IsFullCargo(creep) || IsEnergySourceEmpty(creep)) {
+                    delete creep.room.memory.sourceList[creep.memory.source].miner[creep.id];
                     creep.memory.state = Memory.workState.state_goToTarget;
                 }
                 break;
@@ -203,10 +218,12 @@ var stateMachine = {
             case Memory.workState.state_transfer:
                 if (IsEmptyCargo(creep) || IsTargetFull(creep)) {
                     creep.memory.state = Memory.workState.state_idle;
+                    creep.memory.task=-1;
                 }
                 break;
             case Memory.workState.state_goToTarget:
                 if (IsNearToTarget(creep)) {
+                    creep.memory.targetPath = undefined;
                     if (IsMine(creep) || IsPickup(creep)) {
                         creep.memory.state = Memory.workState.state_transfer;
                     }
@@ -235,13 +252,58 @@ var stateMachine = {
                 break;
         }
     },
-    clacSpawnState: function (spawn) {
+    calcSpawnState: function (spawn) {
         switch (spawn.memory.state) {
             case Memory.spawnState.state_idle:
                 if (!IsNoTask(spawn)) {
                     if (IsSpawnWorker(spawn)) {
-                        creep.memory.state = Memory.spawnState.state_idle;
+                        if (canSpawn(spawn)) {
+                            console.log(spawn.memory.unit.body,
+                                spawn.memory.unit.name,
+                                { memory: spawn.memory.unit.memory });
+                            spawn.spawnCreep(spawn.memory.unit.body,
+                                spawn.memory.unit.name,
+                                { memory: spawn.memory.unit.memory }
+                            );
+                            spawn.room.memory.expectCost -= spawn.memory.cost;
+                            spawn.room.memory.workPartsCount +=spawn.memory.unit.memory.workParts;
+                            spawn.memory.state = Memory.spawnState.state_spawn;
+                        }
+                        else {
+                            spawn.memory.state = Memory.spawnState.state_waitResource;
+                        }
                     }
+                }
+                break;
+            case Memory.spawnState.state_waitResource:
+                if (IsSpawnWorker(spawn)) {
+                    if (canSpawn(spawn)) {
+                        spawn.spawnCreep(spawn.memory.unit.body,
+                            spawn.memory.unit.name,
+                            { memory: spawn.memory.unit.memory }
+                        );
+                        spawn.room.memory.expectCost -= spawn.memory.cost;
+                        spawn.room.memory.workPartsCount +=spawn.memory.unit.memory.workParts;
+                        spawn.memory.state = Memory.spawnState.state_spawn;
+                    }
+                }
+                break;
+            case Memory.spawnState.state_spawn:
+                if (!IsSpawning(spawn)) {
+                    spawn.memory.state = Memory.spawnState.state_idle;
+                    spawn.memory.task=-1;
+                }
+                break;
+            case Memory.spawnState.state_renew:
+                if (IsNoTask(spawn)) {
+                    spawn.memory.state = Memory.spawnState.state_idle
+                    spawn.memory.task=-1;
+                }
+                break;
+            case Memory.spawnState.state_recycle:
+                if (IsNoTask(spawn)) {
+                    spawn.memory.state = Memory.spawnState.state_idle
+                    spawn.memory.task=-1;
                 }
                 break;
         }

@@ -1,5 +1,3 @@
-
-
 var task = {
     assignTaskMine: function (creep, taskData) {
         creep.memory.task = taskData.type;
@@ -18,6 +16,7 @@ var task = {
         spawn.memory.task = taskData.type;
         spawn.memory.unit = {
             body: taskData.worker.part,
+            name : taskData.name,
             memory: {
                 role: Memory.role.role_worker,
                 state: Memory.workState.state_idle,
@@ -27,7 +26,10 @@ var task = {
                 task: -1
             }
         };
+        spawn.memory.cost = taskData.worker.cost;
+
+        spawn.room.memory.expectCost += taskData.worker.cost;
     }
-}
+};
 
 module.exports = task;

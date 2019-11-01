@@ -1,4 +1,4 @@
-var task = require('task');
+var task = require('taskAssign');
 var production = require('production');
 var TE = require('timeEstimate');
 
@@ -98,13 +98,14 @@ function calcSpawnWorkerDesire(spawn) {
     if (shortage <= 0) {
         return {
             desire: 0,
-            taskData: {}
+            task: {}
         };
     }
     return {
         desire: shortage,
-        taskData: {
+        task: {
             type: Memory.task.task_spawnWorker,
+            name: 'SCP'+Game.time,
             worker: production.designWorker(spawn.room)
         }
     };
@@ -141,12 +142,6 @@ var taskSchedule = {
 
         var source = room.find(FIND_SOURCES);
         for (var sourceName in source) {
-            console.log(
-                source[sourceName].id,
-                source[sourceName].pos,
-                getMaxMiner(source[sourceName]),
-                source[sourceName].energyCapacity
-            );
             room.memory.sourceList[source[sourceName].id] = {
                 pos: source[sourceName].pos,
                 maxMiner: getMaxMiner(source[sourceName]),
@@ -156,7 +151,7 @@ var taskSchedule = {
         }
 
         room.memory.workPartsCount = 0;
-        room.memory.maxWorkPartsCount = source.length() * 5 + 10;
+        room.memory.maxWorkPartsCount = source.length * 5 + 10;
 
     },
     workerTaskArrange: function (creep) {
@@ -170,7 +165,7 @@ var taskSchedule = {
         }
     },
     spawnTaskArrange: function (spawn) {
-        var res = calcSpawnWorkerDesire();
+        var res = calcSpawnWorkerDesire(spawn);
         var taskData = res.task;
         var desire = res.desire;;
         if(desire !=0){

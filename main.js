@@ -1,6 +1,7 @@
-var worker = require('role.worker');
-var task = require('task');
+var roleWorker = require('role.worker');
+var roleSpawn = require('role.spawn');
 var construction = require('construction')
+var task = require('taskAssign')
 var TS = require('taskSchedule');
 var TE = require('timeEstimate');
 
@@ -8,22 +9,21 @@ function memoryInit() {
     if (Memory.Begin == undefined) {
         Memory.Begin = 0;
         //main init
-        Memory.constant={};
-        Memory.structures={};
-        Memory.task={};
-        Memory.role={};
+        Memory.constant = {};
+        Memory.structures = {};
+        Memory.task = {};
+        Memory.role = {};
 
 
         //initTasks
         TS.init();
-        worker.init();
+        roleWorker.init();
+        roleSpawn.init();
         construction.init();
-        for(var spawn in Game.spawns){
+        for (var spawn in Game.spawns) {
             TS.roomInit(Game.spawns[spawn].room);
             construction.structureInit(Game.spawns[spawn]);
         }
-        //Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], 'Fun', { memory: { role: Memory.role.role_worker,state: Memory.workState.state_idle,bodyParts: 1,moveParts:1,workParts:1,task:-1 } });
-//       var source = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
     }
 }
 
@@ -38,18 +38,24 @@ module.exports.loop = function () {
         }
     }
     if (Game.time % 5 == 0) {
-        Game.spawns['Spawn1'].spawnCreep([WORK, CARRY, MOVE], Game.time, { memory: { role: Memory.role.role_worker,state: Memory.workState.state_idle,bodyParts: 1,moveParts:1,workParts:1,task:-1 } });
     }
-    console.log(Game.time);
     for (var name in Game.creeps) {
         var unit = Game.creeps[name];
         if (unit.spawning == false) {
             if (Game.creeps[name].memory.role == Memory.role.role_worker) {
-                if(Game.creeps[name].memory.task==-1){
+                if (Game.creeps[name].memory.task == -1) {
                     TS.workerTaskArrange(Game.creeps[name]);
                 }
-                worker.run(Game.creeps[name]);
+                roleWorker.run(Game.creeps[name]);
             }
         }
+    }
+
+    for (var name in Game.spawns) {
+        var unit = Game.spawns[name];
+        if (Game.spawns[name].memory.task == -1) {
+            TS.spawnTaskArrange(Game.spawns[name]);
+        }
+        roleSpawn.run(Game.spawns[name]);
     }
 }

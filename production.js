@@ -5,6 +5,7 @@ var production = {
             workParts: 1,
             moveParts: 1,
             bodyParts: 3,
+            cost:200
         };
     },
     spawnTaskGen: function (room) {

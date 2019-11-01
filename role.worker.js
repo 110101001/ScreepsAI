@@ -24,36 +24,9 @@ var worker = {
     },
 
     run: function (creep) {
-        var lastState = creep.memory.state;
         stateMachine.calcWorkerState(creep);
-        if (lastState != creep.memory.state) {//stateCompleteHandler
-            switch (lastState) {
-                case Memory.workState.state_goToSource:
-                    creep.memory.sourcePath = undefined;
-                    break;
-                case Memory.workState.state_haverst:
-                    delete creep.room.memory.sourceList[creep.memory.source].miner[creep.id];
-                    break;
-                case Memory.workState.state_transfer:
-                    if (Game.getObjectById(creep.memory.target).energy == Game.getObjectById(creep.memory.target).energyCapacity) {
-                        Memory.structures[creep.memory.target].expectEnergy = 0;
-                    }
-                    else {
-                        Memory.structures[creep.memory.target].expectEnergy -= creep.memory.amount;
-                    }
-                    creep.room.memory.expectIncome -= creep.memory.amount;
-                    break;
-                case Memory.workState.state_goToTarget:
-                    creep.memory.targetPath = undefined;
-                    break;
-                case Memory.workState.state_build:
-            }
-        }
 
         switch (creep.memory.state) {
-            case Memory.workState.state_idle:
-                creep.memory.task = -1;
-                break;
             case Memory.workState.state_goToSource:
                 creep.moveTo(Game.getObjectById(creep.memory.source), { reusePath: Memory.constant.reusePath });
                 break;
@@ -64,6 +37,8 @@ var worker = {
                 break;
             case Memory.workState.state_transfer:
                 creep.transfer(Game.getObjectById(creep.memory.target), RESOURCE_ENERGY);
+                Memory.structures[creep.memory.target].expectEnergy -= creep.memory.amount;
+                creep.room.memory.expectIncome -= creep.memory.amount;
                 break;
             case Memory.workState.state_goToTarget:
                 creep.moveTo(Game.getObjectById(creep.memory.target), { reusePath: Memory.constant.reusePath });

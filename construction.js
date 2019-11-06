@@ -10,15 +10,21 @@ var construction={
     spawnInit:function(spawn){
         spawn.memory.task=-1;
     },
-    constructGen: function (room) {
+    roadDesign:function(room){
+
+    },
+    constructDesign: function (room) {
         //Normal Develop Sequence:
-        //RCL1->RCL2->road1->extension5->RCL3->Tower1->road2->extension10->RCL4->extension20->
+        //RCL1->RCL2->road1->extension5->RCL3->Tower1->road2->extension10->RCL4->extension20->allRoad
         switch (room.memory.task) {
             case Memory.roomTask.task_idle:
                 switch (room.memory.stage) {
                     case Memory.roomStage.L1://RCL1->RCL2
                         //do nothing but to wait for upgrade
                         break;
+                        case Memory.roomStage.L2://RCL2->road
+                            constructRoad();
+                            break;
                 }
                 break;
         }

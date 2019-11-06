@@ -16,9 +16,9 @@ function expMiner(source, time) {
 function expMineWait(source, time) {
     var flag = false;
     var recentLeave;
+    var minerList = source.room.memory.sourceList[source.id].miner;
+    var minRecentLeave = time;
     while (flag == false) {
-        var minerList = source.room.memory.sourceList[source.id].miner;
-        var minRecentLeave = time;
         for (var miner in minerList) {
             if ((minerList[miner].end >= minRecentLeave && (recentLeave == undefined || minerList[miner].end < recentLeave))) {
                 recentLeave = minerList[miner].end;
@@ -65,8 +65,9 @@ var timeEstimate = {
         var expCargo=0;
         var ETAS = this.estimatePathTime(creep,sourcePath, 0);
         var ETAW =0;
-        if (expMiner(source, ETAS) >= source.room.memory.sourceList[source.id].maxMiner) {
-            ETAW=expMineWait(source,time+ETAS);
+        if (expMiner(source, Game.time+ETAS) >= source.room.memory.sourceList[source.id].maxMiner) {
+            //ETAW=expMineWait(source,Game.time+ETAS)-Game.time;
+            ETAW=9999;
             //console.log('wait'+ETAW);
         }
         var ETAH=0;
@@ -80,6 +81,7 @@ var timeEstimate = {
         }
         var ETAT=this.estimatePathTime(creep, targetPath, expCargo);
         var totalTime=ETAS+ETAW+ETAH+ETAT;
+       
         return {
             total:totalTime,
             source:ETAS,

@@ -26,37 +26,66 @@ function EnergyNeed(room) {
     }
 }
 
-//Estimate the time to fininsh mining and transporting and the income, then give a desire value based on the two values and energy requirment
-//Also provide everything to assign a task
-function CalcMineDesire(creep) {
-    var energyRequire = EnergyNeed(creep.room);
-    //if (energyRequire <= 0) {
-    //    return { desire: 0, task: {} };
-    //}
-
-    //find source
+function findSource(creep) {
     var sources = creep.room.find(FIND_SOURCES, {
         filter: (source) => {
             return (source.room.memory.sourceList[source.id].expectEnergy > 0);
         }
     });
+
     if (sources == undefined) {
-        return { desire: 0, task: {} };
+        return {
+            source: undefined,
+            path: undefined
+        };
     }
+
     var bestSource = sources[0];
     var lowestTime;
     var sourcePath;
     var path;
     for (var source in sources) {
         var path = creep.pos.findPathTo(sources[source]);
-        var time = TE.estimateMineTime(creep, sources[source], path, {}, {}).total;
+        var timeEs = TE.estimateMineTime(creep, sources[source], path, {}, {});
+        var time=timeEs.source+timeEs.wait;
         if (lowestTime == undefined || time < lowestTime) {
             lowestTime = time;
             bestSource = sources[source];
             sourcePath = path;
         }
     }
+    return {
+        source: bestSource,
+        path: sourcePath
+    };
+}
 
+function mineAmount(creep, source) {
+    var income;
+    if (source.room.memory.sourceList[source.id].expectEnergy > creep.store.getFreeCapacity()) {
+        income = creep.store.getCapacity();
+    }
+    else {
+        income = source.room.memory.sourceList[source.id].expectEnergy;
+    }
+    return income;
+}
+//Estimate the time to fininsh mining and transporting and the income, then give a desire value based on the two values and energy requirment
+//Also provide everything to assign a task
+function calcMineDesire(creep) {
+    var energyRequire = EnergyNeed(creep.room);
+    //if (energyRequire <= 0) {
+    //    return { desire: 0, task: {} };
+    //}
+
+    //find source
+
+    var res = findSource(creep);
+    var sourcePath = res.path;
+    var bestSource = res.source;
+    if (bestSource == undefined) {
+        return { desire: 0, task: {} };
+    }
 
     //find target
     var target = bestSource.pos.findClosestByRange(FIND_STRUCTURES, {
@@ -68,17 +97,12 @@ function CalcMineDesire(creep) {
         return { desire: 0, task: {} };
     }
 
-    var miningPoint = new RoomPosition(sourcePath[sourcePath.length - 2].x, sourcePath[sourcePath.length - 2].y, creep.room.name);
+    var miningPoint = new RoomPosition(sourcePath[sourcePath.length - 1].x, sourcePath[sourcePath.length - 1].y, creep.room.name);
     var targetPath = miningPoint.findPathTo(target);
     var time = TE.estimateMineTime(creep, bestSource, sourcePath, target, targetPath);
 
-    var income;
-    if (bestSource.room.memory.sourceList[bestSource.id].expectEnergy > creep.store.getFreeCapacity()) {
-        income = creep.store.getCapacity();
-    }
-    else {
-        income = bestSource.room.memory.sourceList[bestSource.id].expectEnergy;
-    }
+    var income = mineAmount(creep, bestSource);
+
     var desire = (income + energyRequire) / time.total;
     return {
         desire: desire,
@@ -93,6 +117,36 @@ function CalcMineDesire(creep) {
     };
 }
 
+function calcUpgradeDesire(creep) {
+    var res = findSource(creep);
+    var sourcePath = res.path;
+    var bestSource = res.source;
+    if (bestSource == undefined) {
+        return { desire: 0, task: {} };
+    }
+    var target = creep.room.controller;
+    var miningPoint = new RoomPosition(sourcePath[sourcePath.length - 1].x, sourcePath[sourcePath.length - 1].y, creep.room.name);
+    var targetPath = miningPoint.findPathTo(target);
+
+    var time = TE.estimateMineTime(creep, bestSource, sourcePath, target, targetPath);
+
+    var amount = mineAmount(creep, bestSource);
+
+    var desire = (creep.room.controller.ticksToDowngrade/CONTROLLER_DOWNGRADE[level]*100 + amount) / time.total;
+
+    return {
+        desire: desire,
+        task: {
+            type: Memory.task.task_upgrade,
+            source: bestSource,
+            target: target,
+            timeStart: Game.time + time.source + time.wait,
+            timeEnd: Game.time + time.source + time.wait + time.harvest,
+            amount:amount
+        }
+    }
+}
+
 function calcSpawnWorkerDesire(spawn) {
     var shortage = spawn.room.memory.maxWorkPartsCount - spawn.room.memory.workPartsCount;
     if (shortage <= 0) {
@@ -105,7 +159,7 @@ function calcSpawnWorkerDesire(spawn) {
         desire: shortage,
         task: {
             type: Memory.task.task_spawnWorker,
-            name: 'SCP'+Game.time,
+            name: 'SCP' + Game.time,
             worker: production.designWorker(spawn.room)
         }
     };
@@ -157,19 +211,33 @@ var taskSchedule = {
     workerTaskArrange: function (creep) {
         //Calc desire for every task
 
-        var res = CalcMineDesire(creep);
+        var res = calcMineDesire(creep);
         var taskData = res.task;
-        var desire = res.desire;;
+        var desire = res.desire;
+
+        res = calcUpgradeDesire(creep);
+        if (desire < res.desire) {
+            var taskData = res.task;
+            var desire = res.desire;
+        }
+
         if (desire != 0) {
-            task.assignTaskMine(creep, taskData);
+            switch (taskData.type) {
+                case Memory.task.task_mine:
+                    task.assignTaskMine(creep, taskData);
+                    break;
+                case Memory.task.task_upgrade:
+                    task.assignTaskUpgrade(creep,taskData);
+                    break;
+            }
         }
     },
     spawnTaskArrange: function (spawn) {
         var res = calcSpawnWorkerDesire(spawn);
         var taskData = res.task;
         var desire = res.desire;;
-        if(desire !=0){
-            task.assignTaskSpawnWorker(spawn,taskData);
+        if (desire != 0) {
+            task.assignTaskSpawnWorker(spawn, taskData);
         }
     }
 };

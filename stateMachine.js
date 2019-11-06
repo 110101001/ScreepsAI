@@ -48,11 +48,21 @@ function IsNearToSource(creep) {
     }
 }
 function IsNearToTarget(creep) {
-    if (creep.pos.isNearTo(Game.getObjectById(creep.memory.target))) {
-        return true;
+    if (IsMine(creep) || IsPickup(creep)) {
+        if (creep.pos.isNearTo(Game.getObjectById(creep.memory.target))) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-    else {
-        return false;
+    else if (IsBuild(creep) || IsUpgrade(creep)) {
+        if (creep.pos.inRangeTo(Game.getObjectById(creep.memory.target), 3)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
 function IsTargetFull(creep) {
@@ -176,6 +186,7 @@ function IsSpawning(spawn) {
 
 var stateMachine = {
     calcWorkerState: function (creep) {
+
         switch (creep.memory.state) {
             case Memory.workState.state_idle:
                 if (!IsNoTask(creep)) {
@@ -188,16 +199,21 @@ var stateMachine = {
                 }
                 break;
             case Memory.workState.state_goToSource:
+                if (Game.time > creep.room.memory.sourceList[creep.memory.source].miner[creep.id].end) {
+                    creep.memory.state = Memory.workState.state_idle;
+                    creep.memory.task = -1;
+                }
                 if (IsNearToSource(creep)) {
                     creep.memory.sourcePath = undefined;
-                    if (IsMine(creep)) {
+                    if (IsMine(creep) || IsBuild(creep) || IsUpgrade(creep)) {
+                        var mineTime = creep.room.memory.sourceList[creep.memory.source].miner[creep.id];
+                        var ETAH = mineTime.end - mineTime.start;
+                        mineTime.start = Game.time;
+                        mineTime.end = mineTime.start + ETAH;
                         creep.memory.state = Memory.workState.state_haverst;
                     }
                     else if (IsPickup(creep)) {
                         creep.memory.state = Memory.workState.state_pickup;
-                    }
-                    else if (Game.getObjectById(creep.memory.source).structureType == undefined) {
-                        creep.memory.state = Memory.workState.state_haverst;
                     }
                     else {
                         creep.memory.state = Memory.workState.state_withdraw;
@@ -218,7 +234,7 @@ var stateMachine = {
             case Memory.workState.state_transfer:
                 if (IsEmptyCargo(creep) || IsTargetFull(creep)) {
                     creep.memory.state = Memory.workState.state_idle;
-                    creep.memory.task=-1;
+                    creep.memory.task = -1;
                 }
                 break;
             case Memory.workState.state_goToTarget:
@@ -238,11 +254,13 @@ var stateMachine = {
             case Memory.workState.state_build:
                 if (IsEmptyCargo(creep) || isTargetInvalid(creep)) {
                     creep.memory.state = Memory.workState.state_idle;
+                    creep.memory.task = -1;
                 }
                 break;
             case Memory.workState.state_upgrade:
                 if (IsEmptyCargo(creep) || (IsTargetControllerMaxLevel(creep) && IsTargetControllerDecayTimeHigh(creep))) {
                     creep.memory.state = Memory.workState.state_idle;
+                    creep.memory.task = -1;
                 }
                 break;
             case Memory.workState.state_pickup:
@@ -258,15 +276,12 @@ var stateMachine = {
                 if (!IsNoTask(spawn)) {
                     if (IsSpawnWorker(spawn)) {
                         if (canSpawn(spawn)) {
-                            console.log(spawn.memory.unit.body,
-                                spawn.memory.unit.name,
-                                { memory: spawn.memory.unit.memory });
                             spawn.spawnCreep(spawn.memory.unit.body,
                                 spawn.memory.unit.name,
                                 { memory: spawn.memory.unit.memory }
                             );
                             spawn.room.memory.expectCost -= spawn.memory.cost;
-                            spawn.room.memory.workPartsCount +=spawn.memory.unit.memory.workParts;
+                            spawn.room.memory.workPartsCount += spawn.memory.unit.memory.workParts;
                             spawn.memory.state = Memory.spawnState.state_spawn;
                         }
                         else {
@@ -283,7 +298,7 @@ var stateMachine = {
                             { memory: spawn.memory.unit.memory }
                         );
                         spawn.room.memory.expectCost -= spawn.memory.cost;
-                        spawn.room.memory.workPartsCount +=spawn.memory.unit.memory.workParts;
+                        spawn.room.memory.workPartsCount += spawn.memory.unit.memory.workParts;
                         spawn.memory.state = Memory.spawnState.state_spawn;
                     }
                 }
@@ -291,19 +306,19 @@ var stateMachine = {
             case Memory.spawnState.state_spawn:
                 if (!IsSpawning(spawn)) {
                     spawn.memory.state = Memory.spawnState.state_idle;
-                    spawn.memory.task=-1;
+                    spawn.memory.task = -1;
                 }
                 break;
             case Memory.spawnState.state_renew:
                 if (IsNoTask(spawn)) {
                     spawn.memory.state = Memory.spawnState.state_idle
-                    spawn.memory.task=-1;
+                    spawn.memory.task = -1;
                 }
                 break;
             case Memory.spawnState.state_recycle:
                 if (IsNoTask(spawn)) {
                     spawn.memory.state = Memory.spawnState.state_idle
-                    spawn.memory.task=-1;
+                    spawn.memory.task = -1;
                 }
                 break;
         }

@@ -45,6 +45,9 @@ var worker = {
                 break;
             case Memory.workState.state_build:
                 break;
+            case Memory.workState.state_upgrade:
+                creep.upgradeController(Game.getObjectById(creep.memory.target));
+                break;
         }
     }
 };

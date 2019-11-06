@@ -36,9 +36,24 @@ module.exports.loop = function () {
                 console.log('Clearing non-existing creep memory:', name);
             }
         }
+
+        for (var spawn in Game.spawns) {
+            if (Game.spawns[spawn].memory.task == undefined) {
+                Game.spawns[spawn].memory.task=-1;
+                Game.spawns[spawn].memory.state=0;
+                construction.structureInit(Game.spawns[spawn]);
+            }
+        }
+
+        for(var room in Game.rooms){
+            if(Game.rooms[room].memory.task==undefined){
+                TS.roomInit(Game.spawns[room]);
+            }
+        }
     }
     if (Game.time % 5 == 0) {
     }
+    console.log('Current Time:'+Game.time);
     for (var name in Game.creeps) {
         var unit = Game.creeps[name];
         if (unit.spawning == false) {

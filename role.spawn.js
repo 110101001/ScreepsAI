@@ -11,10 +11,6 @@ var spawn = {
         };
         Memory.task.task_spawnWorker = 0;
 
-        for (var name in Game.spawns) {
-            Game.spawns[name].memory.task=-1;
-            Game.spawns[name].memory.state=0;
-        }
     },
     run: function (spawn) {
         stateMachine.calcSpawnState(spawn);

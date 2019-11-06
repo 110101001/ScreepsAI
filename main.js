@@ -27,33 +27,67 @@ function memoryInit() {
     }
 }
 
+function creepDeathHandler(creep){
+    for (var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            switch(Game.creeps[name].memory.role){
+                case Memory.role.role_worker:
+                    switch(Game.creeps[name].memory.task){
+                        case task_mine:
+                            switch(Game.creeps[name].memory.state){
+
+                            }
+                    }
+                break;
+            }
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }
+}
+
 module.exports.loop = function () {
     memoryInit();
-    if (Game.time % 10 == 0) {
-        for (var name in Memory.creeps) {
-            if (!Game.creeps[name]) {
-                delete Memory.creeps[name];
-                console.log('Clearing non-existing creep memory:', name);
+    //=======================================
+    {   
+        if(Game.time % 300==0){
+            for (var roomName in Game.rooms) {
+                var room=Game.rooms[roomName];
+                for (var sources in room.memory.sourceList){
+                    room.memory.sourceList[sources].expectEnergy=Game.getObjectById(sources).energyCapacity-Game.getObjectById(sources).energy+room.memory.sourceList[sources].expectEnergy;
+                }
             }
         }
-
-        for (var spawn in Game.spawns) {
-            if (Game.spawns[spawn].memory.task == undefined) {
-                Game.spawns[spawn].memory.task=-1;
-                Game.spawns[spawn].memory.state=0;
-                construction.structureInit(Game.spawns[spawn]);
+        if (Game.time % 10 == 0) {
+            
+        }
+        if (Game.time % 10 == 1) {
+            for (var spawn in Game.spawns) {
+                if (Game.spawns[spawn].memory.task == undefined) {
+                    Game.spawns[spawn].memory.task = -1;
+                    Game.spawns[spawn].memory.state = 0;
+                    construction.structureInit(Game.spawns[spawn]);
+                }
             }
         }
-
-        for(var room in Game.rooms){
-            if(Game.rooms[room].memory.task==undefined){
-                TS.roomInit(Game.spawns[room]);
+        if (Game.time % 10 == 2) {
+            for (var room in Game.rooms) {
+                if (Game.rooms[room].memory.task == undefined) {
+                    TS.roomInit(Game.spawns[room]);
+                }
+            }
+        }
+        if (Game.time % 10 == 3) {
+            for (var room in Game.rooms) {
+                construction.constructDesign(Game.rooms[room]);
             }
         }
     }
+    //=======================================
+
     if (Game.time % 5 == 0) {
     }
-    console.log('Current Time:'+Game.time);
+    console.log('Current Time:' + Game.time);
     for (var name in Game.creeps) {
         var unit = Game.creeps[name];
         if (unit.spawning == false) {

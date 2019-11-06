@@ -44,6 +44,7 @@ var worker = {
                 creep.moveTo(Game.getObjectById(creep.memory.target), { reusePath: Memory.constant.reusePath });
                 break;
             case Memory.workState.state_build:
+                creep.build(Game.getObjectById(creep.memory.target));
                 break;
             case Memory.workState.state_upgrade:
                 creep.upgradeController(Game.getObjectById(creep.memory.target));

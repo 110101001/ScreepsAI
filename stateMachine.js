@@ -105,14 +105,6 @@ function IsTargetControllerMaxLevel(creep) {
         return false;
     }
 }
-function IsTargetControllerDecayTimeHigh(creep) {
-    if (Game.getObjectById(creep.memory.target).ticksToDowngrade > 1000) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
 function isTargetInvalid(creep) {
     if (Game.getObjectById(creep.memory.target) == null) {
         return true;
@@ -186,7 +178,6 @@ function IsSpawning(spawn) {
 
 var stateMachine = {
     calcWorkerState: function (creep) {
-
         switch (creep.memory.state) {
             case Memory.workState.state_idle:
                 if (!IsNoTask(creep)) {
@@ -258,7 +249,7 @@ var stateMachine = {
                 }
                 break;
             case Memory.workState.state_upgrade:
-                if (IsEmptyCargo(creep) || (IsTargetControllerMaxLevel(creep) && IsTargetControllerDecayTimeHigh(creep))) {
+                if (IsEmptyCargo(creep)) {
                     creep.memory.state = Memory.workState.state_idle;
                     creep.memory.task = -1;
                 }

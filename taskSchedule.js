@@ -33,7 +33,7 @@ function findSource(creep) {
         }
     });
 
-    if (sources == undefined) {
+    if (sources == null) {
         return {
             source: undefined,
             path: undefined
@@ -47,7 +47,7 @@ function findSource(creep) {
     for (var source in sources) {
         var path = creep.pos.findPathTo(sources[source]);
         var timeEs = TE.estimateMineTime(creep, sources[source], path, {}, {});
-        var time=timeEs.source+timeEs.wait;
+        var time = timeEs.source + timeEs.wait;
         if (lowestTime == undefined || time < lowestTime) {
             lowestTime = time;
             bestSource = sources[source];
@@ -58,6 +58,11 @@ function findSource(creep) {
         source: bestSource,
         path: sourcePath
     };
+}
+
+function findSite(creep) {
+    var site = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
+    return site;
 }
 
 function mineAmount(creep, source) {
@@ -132,8 +137,7 @@ function calcUpgradeDesire(creep) {
 
     var amount = mineAmount(creep, bestSource);
 
-    var desire = (creep.room.controller.ticksToDowngrade/CONTROLLER_DOWNGRADE[level]*100 + amount) / time.total;
-
+    var desire = ((1-(creep.room.controller.ticksToDowngrade / CONTROLLER_DOWNGRADE[creep.room.controller.level])) * 100 + amount) / time.total;
     return {
         desire: desire,
         task: {
@@ -142,7 +146,41 @@ function calcUpgradeDesire(creep) {
             target: target,
             timeStart: Game.time + time.source + time.wait,
             timeEnd: Game.time + time.source + time.wait + time.harvest,
-            amount:amount
+            amount: amount
+        }
+    }
+}
+
+function calcBuildDesire(creep) {
+    var target = findSite(creep);
+    if (target == null) {
+        return { desire: 0, task: {} }
+    }
+
+    var res = findSource(creep);
+    var sourcePath = res.path;
+    var bestSource = res.source;
+    if (bestSource == undefined) {
+        return { desire: 0, task: {} };
+    }
+
+    var miningPoint = new RoomPosition(sourcePath[sourcePath.length - 1].x, sourcePath[sourcePath.length - 1].y, creep.room.name);
+    var targetPath = miningPoint.findPathTo(target);
+
+    var time = TE.estimateMineTime(creep, bestSource, sourcePath, target, targetPath);
+
+    var amount = mineAmount(creep, bestSource);
+
+    var desire=2*amount/time.total;
+    return {
+        desire: desire,
+        task: {
+            type: Memory.task.task_build,
+            source: bestSource,
+            target: target,
+            timeStart: Game.time + time.source + time.wait,
+            timeEnd: Game.time + time.source + time.wait + time.harvest,
+            amount: amount
         }
     }
 }
@@ -221,13 +259,22 @@ var taskSchedule = {
             var desire = res.desire;
         }
 
+        res = calcBuildDesire(creep);
+        if (desire < res.desire) {
+            var taskData = res.task;
+            var desire = res.desire;
+        }
+        
         if (desire != 0) {
             switch (taskData.type) {
                 case Memory.task.task_mine:
                     task.assignTaskMine(creep, taskData);
                     break;
+                    case Memory.task.task_build:
+                    task.assignTaskBuild(creep,taskData);
+                    break;
                 case Memory.task.task_upgrade:
-                    task.assignTaskUpgrade(creep,taskData);
+                    task.assignTaskUpgrade(creep, taskData);
                     break;
             }
         }

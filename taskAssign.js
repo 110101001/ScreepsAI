@@ -20,6 +20,15 @@ var task = {
         creep.room.memory.sourceList[taskData.source.id].expectEnergy -= taskData.amount;
         creep.room.memory.sourceList[taskData.source.id].miner[creep.id] = { start: taskData.timeStart, end: taskData.timeEnd };
     },
+    assignTaskBuild: function (creep,taskData){
+        creep.memory.task = taskData.type;
+        creep.memory.source = taskData.source.id;
+        creep.memory.target = taskData.target.id;
+
+        creep.room.memory.sourceList[taskData.source.id].expectEnergy -= taskData.amount;
+        creep.room.memory.sourceList[taskData.source.id].miner[creep.id] = { start: taskData.timeStart, end: taskData.timeEnd };
+
+    },
     assignTaskSpawnWorker: function (spawn, taskData) {
         spawn.memory.task = taskData.type;
         spawn.memory.unit = {

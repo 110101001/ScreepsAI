@@ -11,11 +11,16 @@ require('prototype.Creep.move')
 */
 
 var miner = {
+    minerCount=0,
     minerMemory: function(source){
         return {
             state:cst.miner.toSource,
             source:source,
         };
+    },
+    makeName: function(){
+        minerCount=minerCount+1;
+        return 'Foundation Mining Site' + minerCount;
     },
     run: function (creep) {
         require('prototype.Creep.move').moveCache.clear();

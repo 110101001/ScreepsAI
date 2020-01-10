@@ -1,4 +1,5 @@
 const cst = {
+    minerType:0,
     miner:{
         toSource:0,
         mine:1,
@@ -21,6 +22,11 @@ const cst = {
                 parts:[WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE]
             }
         }
+    },
+    source:{
+        hasMiner:0,
+        mining:1,
+        noMiner:2,
     }
 };
 

@@ -24,7 +24,7 @@ creep.moveTo(target,{ignoreCreeps:false})
 var config = {
     changemove: true,//实现对穿
     changemoveTo: true,//优化moveTo寻路默认使用ignoreCreep=true
-    roomCallbackWithoutCreep:undefined,//moveTo默认使用的忽视creep的callback函数
+    roomCallbackWithoutCreep: undefined,//moveTo默认使用的忽视creep的callback函数
     roomCallbackWithCreep: undefined,//moveTo默认使用的计算creep体积的callback函数
     changeFindClostestByPath: true,  //修改findClosestByPath 使得默认按照对穿路径寻找最短
     reusePath: 5 //增大默认寻路缓存

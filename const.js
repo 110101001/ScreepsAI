@@ -1,5 +1,6 @@
 const cst = {
     minerType: 0,
+    carrierType: 1,
     miner: {
         toSource: 0,
         mine: 1,
@@ -20,6 +21,30 @@ const cst = {
             ultra: {
                 cost: 1050,
                 parts: [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE]
+            }
+        }
+    },
+    carrier: {
+        toMiner: 0,
+        toTarget: 1,
+        pull: 2,
+        wait:3,
+        type: {
+            basic: {
+                cost: 100,
+                parts: [CARRY, MOVE]
+            },
+            medium: {
+                cost: 300,
+                parts: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE]
+            },
+            advanced: {
+                cost: 500,
+                parts: [CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE]
+            },
+            ultra: {
+                cost: 1000,
+                parts: [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
             }
         }
     },

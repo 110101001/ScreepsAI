@@ -1,13 +1,16 @@
 const cst = require('const');
-const spawn = require('role.spawn');
+var spawn = require('role.spawn');
 
 var production = {
     run: function (room) {
-        for (s in room.memory.sources) {
+        var spawns = room.find(FIND_MY_SPAWNS);
+        for (var spn in spawns) {
+            spawns[spn].memory.mutex=false;
+        }
+        for (var s in room.memory.sources) {
             if (room.memory.sources[s].state == cst.source.noMiner) {
-                var spawns = room.find(FIND_MY_SPAWNS);
-                for (spn in spawns) {
-                    if (spawns[spn].spawning == null) {
+                for (var spn in spawns) {
+                    if (spawns[spn].spawning == null&&spawns[spn].memory.mutex==false) {
                         spawn.spawnMiner(spawns[spn], s);
                         break;
                     }
@@ -16,3 +19,5 @@ var production = {
         }
     }
 }
+
+module.exports = production;

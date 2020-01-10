@@ -1,28 +1,28 @@
 const cst = require('const');
 require('prototype.Creep.move');
 /*
-    This is miner creep, it will be assigned to a unique source and works until die.
+    This is carrier creep, it will be assigned to a unique source and carries its miner's output, or assist miner's movement.
 */
 /*
-    miner.memory={
-        type:cst.minerType
+    carrier.memory={
+        type:cst.carrierType
         state, The state machine's current state
         source, The assigned source
     }
 */
 
-var miner = {
-    minerCount:0,
-    minerMemory: function (source) {
+var carrier = {
+    carrierCount:0,
+    carrierMemory: function (source) {
         return {
-            type: cst.minerType,
-            state: cst.miner.toSource,
+            type: cst.carrierType,
+            state: cst.carrier.toMiner,
             source: source,
         };
     },
     makeName: function () {
-        this.minerCount = this.minerCount + 1;
-        return 'Foundation Mining Site ' + this.minerCount;
+        this.carrierCount = this.carrierCount + 1;
+        return 'Foundation Tranportation Unit ' + this.carrierCount;
     },
     run: function (creep) {
         require('prototype.Creep.move').moveCache.clear();
@@ -57,4 +57,4 @@ var miner = {
     }
 };
 
-module.exports = miner;
+module.exports = carrier;

@@ -1,4 +1,5 @@
 var miner = require('role.miner');
+var carrier = require('role.carrier');
 const cst = require('const');
 
 function selectType(types, room) {
@@ -26,6 +27,18 @@ var spawn = {
             source.room.memory.sources[sourceId].name = miner.makeName();
         }
         var res = spawn.spawnCreep(body, source.room.memory.sources[sourceId].name, { memory: miner.minerMemory(sourceId) });
+        if (res == OK) {
+            source.room.memory.sources[sourceId].state = cst.source.hasMiner;
+            spawn.memory.mutex=true;
+        }
+        return res;
+    },
+    spawnCarrier: function (spawn, sourceId) {
+        var body = selectType(cst.carrier.type,spawn.room);
+        var source = Game.getObjectById(sourceId);
+        name = carrier.makeName();
+
+        var res = spawn.spawnCreep(body, name, { memory: carrier.carrierMemory(sourceId) });
         if (res == OK) {
             source.room.memory.sources[sourceId].state = cst.source.hasMiner;
             spawn.memory.mutex=true;

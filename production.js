@@ -16,6 +16,14 @@ var production = {
                     }
                 }
             }
+            if(room.memory.sources[s].carrierCount<2){ 
+                for (var spn in spawns) {
+                    if (spawns[spn].spawning == null&&spawns[spn].memory.mutex==false) {
+                        spawn.spawnCarrier(spawns[spn], s);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

@@ -26,9 +26,11 @@ const cst = {
     },
     carrier: {
         toMiner: 0,
-        toTarget: 1,
-        pull: 2,
-        wait:3,
+        toPos: 1,
+        toTarget: 2,
+        pull: 3,
+        fetch:4,
+        export:5,
         type: {
             basic: {
                 cost: 100,

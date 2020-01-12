@@ -8,7 +8,8 @@ var source={
             room.memory.sources[sources[s].id]={
                 state:cst.source.noMiner,
                 carrierCount:0,
-                name:null
+                name:null,
+                pos:null
             };
         }
     }

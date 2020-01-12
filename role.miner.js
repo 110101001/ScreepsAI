@@ -34,6 +34,7 @@ var miner = {
                 //state convert
                 if (creep.pos.isNearTo(source)) {
                     creep.room.memory.sources[source.id].state = cst.source.mining;
+                    creep.room.memory.sources[source.id].pos = creep.pos;
                     creep.memory.state = cst.miner.mine;
                 }
                 break;
